@@ -18,9 +18,15 @@
 
 - 你理解的对于类似ucore这样需要进程/虚存/文件系统的操作系统，在硬件设计上至少需要有哪些直接的支持？至少应该提供哪些功能的特权指令？
 
+在硬件设计上需要中断、页表、内存的支持，提供中断相关、页表相关的特权指令，以及内存读写、外设读写的指令。
+
 - 你理解的x86的实模式和保护模式有什么区别？物理地址、线性地址、逻辑地址的含义分别是什么？
 
+实模式是早期机型或者为了兼容早期机型下操作系统的运行模式，是16位，可访问内存空间不超过1MB，而保护模式是32位；同时实模式不支持分页和分段，而保护模式支持。物理地址指的是内存的实际地址；线性地址指的是开启页机制时使程序认为其独占整个内存空间，在这个内存空间中的地址；逻辑地址指的是应用程序直接使用的地址空间（？）。
+
 - 你理解的risc-v的特权模式有什么区别？不同 模式在地址访问方面有何特征？
+
+
 
 - 理解ucore中list_entry双向链表数据结构及其4个基本操作函数和ucore中一些基于它的代码实现（此题不用填写内容）
 
@@ -39,6 +45,8 @@
     unsigned gd_off_31_16 : 16;        // high bits of offset in segment
  };
 ```
+
+某个参数所占的二进制位长度。
 
 - 对于如下的代码段，
 
@@ -63,17 +71,33 @@ SETGATE(intr, 1,2,3,0);
 ```
 请问执行上述指令后， intr的值是多少？
 
+intr的十六进制表示：0x0003000200f10000
+
 ### 课堂实践练习
 
 #### 练习一
 
 1. 请在ucore中找一段你认为难度适当的AT&T格式X86汇编代码，尝试解释其含义。
 
+![extracted code from /boot/bootasm.S](https://github.com/amy21206/os_course_exercises/blob/2019spring/all/01-3-lab0-spoc-discussion-answerpic.png)
+
+通过不断从输入缓存区中读入内容直至发现为空来判断当前是否为忙，如果不是则分别通过输出数据控制开始写入P2口和写入数据的两步修改一个值，使物理地址可以大于1MB，辅助切换到保护状态。
+
 2. (option)请在rcore中找一段你认为难度适当的RV汇编代码，尝试解释其含义。
 
 #### 练习二
 
 宏定义和引用在内核代码中很常用。请枚举ucore或rcore中宏定义的用途，并举例描述其含义。
+
+用途一般是简化常用或结构复杂、功能单一、重复使用的代码以节省操作系统指令所占内存空间且便于复用。
+例如ucore中/boot/bootasm.S的：
+
+![extracted code from /boot/bootasm.S](https://github.com/amy21206/os_course_exercises/blob/2019spring/all/01-3-lab0-spoc-discussion-answerpic1.png)
+
+其中用到的宏定义就是/boot/asm.h中的：
+![extracted code from /boot/asm.h](https://github.com/amy21206/os_course_exercises/blob/2019spring/all/01-3-lab0-spoc-discussion-answerpic2.png)
+
+这里的含义就是定义一段汇编代码的格式。
 
 #### reference
  - [Intel格式和AT&T格式汇编区别](http://www.cnblogs.com/hdk1993/p/4820353.html)
