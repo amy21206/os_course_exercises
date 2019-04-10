@@ -31,11 +31,24 @@ struct proc_struct {
     list_entry_t hash_link;                     // Process hash list
 };
 ~~~
-进程状态、
+
+包括进程状态、ID、运行时长、栈、是否需要reschedule、父进程、内存、trap frame、页表基地址、标识位、名字、进程链表、哈希表
 
 ### 12.2 进程创建
 
 1. fork()的返回值是唯一的吗？父进程和子进程的返回值是不同的。请找到相应的赋值代码。
+
+不是，父进程和子进程返回值不同。
+~~~c
+fork_out:
+    return ret;
+
+bad_fork_cleanup_kstack:
+    put_kstack(proc);
+bad_fork_cleanup_proc:
+    kfree(proc);
+    goto fork_out;
+~~~
 
 2. 新进程创建时的进程标识是如何设置的？请指明相关代码。
 
