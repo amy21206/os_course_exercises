@@ -5,9 +5,33 @@
 
 1. 进程切换的可能时机有哪些？
 
+分配的时间片耗尽；有高优先级的进程就绪进行抢占；当前进程运行结束。
+
 2. 分析ucore的进程切换代码，说明ucore的进程切换触发时机和进程切换的判断时机都有哪些。
 
+分配的时间片耗尽；当前进程运行结束进入僵尸状态。
+
 3. ucore的进程控制块数据结构是如何组织的？主要字段分别表示什么？
+
+~~~c
+struct proc_struct {
+    enum proc_state state;                      // Process state
+    int pid;                                    // Process ID
+    int runs;                                   // the running times of Proces
+    uintptr_t kstack;                           // Process kernel stack
+    volatile bool need_resched;                 // bool value: need to be rescheduled to release CPU?
+    struct proc_struct *parent;                 // the parent process
+    struct mm_struct *mm;                       // Process's memory management field
+    struct context context;                     // Switch here to run process
+    struct trapframe *tf;                       // Trap frame for current interrupt
+    uintptr_t cr3;                              // CR3 register: the base addr of Page Directroy Table(PDT)
+    uint32_t flags;                             // Process flag
+    char name[PROC_NAME_LEN + 1];               // Process name
+    list_entry_t list_link;                     // Process link list 
+    list_entry_t hash_link;                     // Process hash list
+};
+~~~
+进程状态、
 
 ### 12.2 进程创建
 
